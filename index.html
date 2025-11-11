@@ -13,26 +13,31 @@
 
         body {
             font-family: 'Courier New', monospace;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: #fff;
-            padding: 20px;
-            line-height: 1.6;
+            background: #008080;
+            color: #000;
+            padding: 4px;
+            line-height: 1.3;
+            overflow: hidden;
+            height: 100vh;
         }
 
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
+            max-width: 100%;
+            height: calc(100vh - 28px);
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            grid-template-columns: 2fr 1fr 1fr;
+            grid-template-rows: auto 1fr 1fr;
+            gap: 4px;
         }
 
         .panel {
-            background: rgba(0, 0, 0, 0.6);
-            border: 2px solid #4a9eff;
-            border-radius: 10px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #fff #000 #000 #fff;
+            padding: 4px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .full-width {
@@ -41,272 +46,274 @@
 
         h1 {
             text-align: center;
-            color: #4af;
-            text-shadow: 0 0 10px rgba(74, 175, 255, 0.5);
-            margin-bottom: 20px;
-            font-size: 2em;
+            color: #fff;
+            background: #000080;
+            margin-bottom: 4px;
+            font-size: 16px;
+            padding: 4px;
+            font-weight: bold;
+            border: 2px solid;
+            border-color: #fff #000 #000 #fff;
         }
 
         h2 {
-            color: #4af;
-            border-bottom: 2px solid #4a9eff;
-            padding-bottom: 5px;
-            margin-bottom: 15px;
-            font-size: 1.3em;
+            color: #fff;
+            background: #000080;
+            padding: 2px 4px;
+            margin-bottom: 4px;
+            font-size: 11px;
+            font-weight: bold;
         }
 
         h3 {
-            color: #8cf;
-            margin-top: 15px;
-            margin-bottom: 10px;
+            color: #000;
+            margin-top: 4px;
+            margin-bottom: 2px;
+            font-size: 10px;
+            font-weight: bold;
         }
 
         .game-info {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2px;
+            margin-bottom: 4px;
         }
 
         .stat-box {
-            background: rgba(74, 175, 255, 0.1);
-            border: 1px solid #4a9eff;
-            padding: 10px;
-            border-radius: 5px;
+            background: #fff;
+            border: 1px solid;
+            border-color: #808080 #fff #fff #808080;
+            padding: 2px 4px;
         }
 
         .stat-label {
-            color: #8cf;
-            font-size: 0.9em;
+            color: #000;
+            font-size: 8px;
+            font-weight: bold;
         }
 
         .stat-value {
-            color: #fff;
-            font-size: 1.2em;
+            color: #000080;
+            font-size: 12px;
             font-weight: bold;
+            text-transform: uppercase;
         }
 
         .action-buttons {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            margin-top: 15px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2px;
+            margin-top: 2px;
         }
 
         button {
-            background: linear-gradient(135deg, #4a9eff 0%, #357abd 100%);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
+            background: #c0c0c0;
+            color: #000;
+            border: 2px solid;
+            border-color: #fff #000 #000 #fff;
+            padding: 3px 4px;
             cursor: pointer;
             font-family: 'Courier New', monospace;
-            font-size: 0.95em;
-            transition: all 0.3s;
-            border: 2px solid transparent;
+            font-size: 9px;
+            font-weight: bold;
         }
 
         button:hover {
-            background: linear-gradient(135deg, #357abd 0%, #4a9eff 100%);
-            border-color: #8cf;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(74, 175, 255, 0.3);
+            background: #d4d0c8;
         }
 
         button:active {
-            transform: translateY(0);
+            border-color: #000 #fff #fff #000;
         }
 
         button:disabled {
-            background: #555;
+            background: #808080;
+            color: #c0c0c0;
             cursor: not-allowed;
-            opacity: 0.5;
         }
 
         .log-container {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid #4a9eff;
-            border-radius: 5px;
-            padding: 15px;
-            max-height: 400px;
+            background: #fff;
+            border: 1px solid;
+            border-color: #808080 #fff #fff #808080;
+            padding: 4px;
+            flex: 1;
             overflow-y: auto;
-            font-size: 0.9em;
+            font-size: 8px;
         }
 
         .log-entry {
-            margin-bottom: 10px;
-            padding: 8px;
-            background: rgba(74, 175, 255, 0.05);
-            border-left: 3px solid #4a9eff;
-            border-radius: 3px;
+            margin-bottom: 2px;
+            padding: 2px;
+            background: #fff;
+            border-left: 2px solid #000080;
         }
 
         .log-turn {
-            color: #ff8;
+            color: #800080;
             font-weight: bold;
         }
 
         .log-event {
-            color: #8f8;
-            margin-left: 10px;
+            color: #008000;
+            margin-left: 4px;
         }
 
         .log-decision {
-            color: #f8f;
-            margin-left: 10px;
+            color: #800000;
+            margin-left: 4px;
         }
 
         .decision-detail {
-            background: rgba(255, 136, 255, 0.1);
-            border: 1px solid #f8f;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            font-size: 0.85em;
+            background: #fff;
+            border: 1px solid #808080;
+            padding: 4px;
+            margin: 2px 0;
+            font-size: 8px;
         }
 
         .option {
-            margin: 5px 0;
-            padding: 5px;
-            background: rgba(74, 175, 255, 0.1);
-            border-left: 2px solid #8cf;
+            margin: 2px 0;
+            padding: 2px;
+            background: #e0e0e0;
+            border-left: 2px solid #000080;
         }
 
         .option-selected {
-            background: rgba(136, 255, 136, 0.2);
-            border-left-color: #8f8;
+            background: #ffff00;
+            border-left-color: #008000;
         }
 
         .score {
-            color: #ff8;
+            color: #ff0000;
             font-weight: bold;
         }
 
         .inventory-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 2px;
+            margin-top: 2px;
         }
 
         .inventory-item {
-            background: rgba(74, 175, 255, 0.1);
-            border: 1px solid #4a9eff;
-            padding: 10px;
-            border-radius: 5px;
+            background: #fff;
+            border: 1px solid;
+            border-color: #808080 #fff #fff #808080;
+            padding: 2px;
             text-align: center;
         }
 
         .item-name {
-            color: #8cf;
+            color: #000;
             font-weight: bold;
+            font-size: 8px;
         }
 
         .item-count {
-            color: #fff;
-            font-size: 1.3em;
+            color: #000080;
+            font-size: 10px;
+            font-weight: bold;
         }
 
         .location-map {
             display: grid;
-            gap: 5px;
-            margin: 15px 0;
+            gap: 2px;
+            margin: 4px 0;
         }
 
         .location-node {
-            background: rgba(74, 175, 255, 0.1);
-            border: 1px solid #4a9eff;
-            padding: 8px;
-            border-radius: 5px;
+            background: #c0c0c0;
+            border: 1px solid #808080;
+            padding: 4px;
             cursor: pointer;
-            transition: all 0.3s;
         }
 
         .location-node:hover {
-            background: rgba(74, 175, 255, 0.2);
-            border-color: #8cf;
+            background: #d4d0c8;
         }
 
         .location-current {
-            background: rgba(136, 255, 136, 0.2);
-            border-color: #8f8;
+            background: #00ff00;
         }
 
         .npc-list {
-            margin-top: 10px;
+            margin-top: 2px;
+            overflow-y: auto;
+            flex: 1;
         }
 
         .npc-card {
-            background: rgba(74, 175, 255, 0.1);
-            border: 1px solid #4a9eff;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
+            background: #fff;
+            border: 1px solid;
+            border-color: #808080 #fff #fff #808080;
+            padding: 3px;
+            margin: 2px 0;
         }
 
         .npc-name {
-            color: #8cf;
+            color: #000;
             font-weight: bold;
-            font-size: 1.1em;
+            font-size: 9px;
         }
 
         .npc-location {
-            color: #ff8;
-            font-size: 0.9em;
+            color: #800080;
+            font-size: 8px;
         }
 
         .affection-bar {
-            background: rgba(0, 0, 0, 0.4);
-            height: 10px;
-            border-radius: 5px;
-            margin: 5px 0;
+            background: #808080;
+            height: 8px;
+            margin: 2px 0;
             overflow: hidden;
+            border: 1px solid;
+            border-color: #000 #fff #fff #000;
         }
 
         .affection-fill {
             height: 100%;
-            background: linear-gradient(90deg, #f44, #ff8, #8f8);
-            transition: width 0.3s;
+            background: #0000ff;
         }
 
         .crop-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 5px;
-            margin: 10px 0;
+            gap: 1px;
+            margin: 2px 0;
+            background: #000;
         }
 
         .crop-plot {
-            background: rgba(139, 69, 19, 0.3);
-            border: 1px solid #8b4513;
-            padding: 8px;
+            background: #8b4513;
+            border: 1px solid #000;
+            padding: 2px;
             text-align: center;
-            font-size: 0.85em;
-            border-radius: 3px;
+            font-size: 7px;
         }
 
         .crop-empty {
-            background: rgba(100, 50, 0, 0.2);
+            background: #a0522d;
         }
 
         .crop-planted {
-            background: rgba(34, 139, 34, 0.3);
-            border-color: #228b22;
+            background: #228b22;
         }
 
         .crop-mature {
-            background: rgba(255, 215, 0, 0.3);
-            border-color: #ffd700;
+            background: #ffff00;
         }
 
         input, select {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid #4a9eff;
-            color: white;
-            padding: 8px;
-            border-radius: 5px;
+            background: #fff;
+            border: 1px solid;
+            border-color: #808080 #fff #fff #808080;
+            color: #000;
+            padding: 2px;
             font-family: 'Courier New', monospace;
-            margin: 5px;
+            margin: 2px;
+            font-size: 9px;
         }
 
         .modal {
@@ -316,139 +323,134 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
             align-items: center;
             justify-content: center;
         }
 
         .modal-content {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            border: 2px solid #4a9eff;
-            border-radius: 10px;
-            padding: 30px;
-            max-width: 600px;
-            max-height: 80vh;
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #fff #000 #000 #fff;
+            padding: 8px;
+            max-width: 400px;
+            max-height: 60vh;
             overflow-y: auto;
         }
 
         .close-btn {
             float: right;
-            font-size: 1.5em;
+            font-size: 14px;
             cursor: pointer;
-            color: #f88;
+            color: #000;
+            font-weight: bold;
         }
 
         ::-webkit-scrollbar {
-            width: 10px;
+            width: 16px;
         }
 
         ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 5px;
+            background: #c0c0c0;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #4a9eff;
-            border-radius: 5px;
+            background: #808080;
+            border: 1px solid;
+            border-color: #fff #000 #000 #fff;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #357abd;
+            background: #a0a0a0;
         }
     </style>
 </head>
 <body>
-    <h1>🌾 Transparent Text-Based Adventure Engine 🌾</h1>
+    <h1>TRANSPARENT TEXT-BASED ADVENTURE ENGINE</h1>
 
     <div class="container">
         <!-- Game Status Panel -->
         <div class="panel full-width">
-            <h2>🎮 Game Status</h2>
+            <h2>GAME STATUS</h2>
             <div class="game-info">
                 <div class="stat-box">
-                    <div class="stat-label">Turn</div>
+                    <div class="stat-label">TURN</div>
                     <div class="stat-value" id="turn">1</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-label">Day</div>
+                    <div class="stat-label">DAY</div>
                     <div class="stat-value" id="day">1</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-label">Season</div>
+                    <div class="stat-label">SEASON</div>
                     <div class="stat-value" id="season">Spring</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-label">Time</div>
+                    <div class="stat-label">TIME</div>
                     <div class="stat-value" id="timeOfDay">Morning</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-label">Weather</div>
-                    <div class="stat-value" id="weather">☀️ Sunny</div>
+                    <div class="stat-label">WEATHER</div>
+                    <div class="stat-value" id="weather">Sunny</div>
                 </div>
             </div>
-        </div>
-
-        <!-- Player Info Panel -->
-        <div class="panel">
-            <h2>👤 Player Info</h2>
-            <div class="stat-box">
-                <div class="stat-label">Location</div>
-                <div class="stat-value" id="playerLocation">Farm Field 1</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Gold</div>
-                <div class="stat-value" id="playerGold">100</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Energy</div>
-                <div class="stat-value" id="playerEnergy">100/100</div>
-            </div>
-
-            <h3>Inventory</h3>
-            <div id="playerInventory" class="inventory-grid"></div>
-        </div>
-
-        <!-- NPCs Panel -->
-        <div class="panel">
-            <h2>👥 NPCs</h2>
-            <div id="npcList" class="npc-list"></div>
-        </div>
-
-        <!-- Crops Panel -->
-        <div class="panel">
-            <h2>🌾 Current Field Crops</h2>
-            <div id="cropsInfo">Not at a farm field</div>
-            <div id="cropsDisplay" class="crop-grid"></div>
-        </div>
-
-        <!-- Actions Panel -->
-        <div class="panel full-width">
-            <h2>⚡ Your Actions</h2>
             <div class="action-buttons">
-                <button onclick="showMoveDialog()">🚶 Move</button>
-                <button onclick="showTalkDialog()">💬 Talk</button>
-                <button onclick="showGiftDialog()">🎁 Give Gift</button>
-                <button onclick="showPlantDialog()">🌱 Plant Seeds</button>
-                <button onclick="showWaterDialog()">💧 Water Crops</button>
-                <button onclick="showHarvestDialog()">🌾 Harvest</button>
-                <button onclick="showBuyDialog()">🛒 Buy</button>
-                <button onclick="showSellDialog()">💰 Sell</button>
-                <button onclick="restAction()">😴 Rest</button>
-                <button onclick="waitAction()">⏳ Wait</button>
+                <button onclick="showMoveDialog()">MOVE</button>
+                <button onclick="showTalkDialog()">TALK</button>
+                <button onclick="showGiftDialog()">GIFT</button>
+                <button onclick="showPlantDialog()">PLANT</button>
+                <button onclick="showWaterDialog()">WATER</button>
+                <button onclick="showHarvestDialog()">HARVEST</button>
+                <button onclick="showBuyDialog()">BUY</button>
+                <button onclick="showSellDialog()">SELL</button>
+                <button onclick="restAction()">REST</button>
+                <button onclick="waitAction()">WAIT</button>
             </div>
         </div>
 
         <!-- Event Log Panel -->
         <div class="panel">
-            <h2>📜 Event Log</h2>
+            <h2>EVENT LOG</h2>
             <div id="eventLog" class="log-container"></div>
+        </div>
+
+        <!-- Player Info Panel -->
+        <div class="panel">
+            <h2>PLAYER</h2>
+            <div class="stat-box">
+                <div class="stat-label">LOCATION</div>
+                <div class="stat-value" id="playerLocation">Farm Field 1</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">GOLD</div>
+                <div class="stat-value" id="playerGold">100</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">ENERGY</div>
+                <div class="stat-value" id="playerEnergy">100/100</div>
+            </div>
+            <h3>INVENTORY</h3>
+            <div id="playerInventory" class="inventory-grid"></div>
+        </div>
+
+        <!-- Crops Panel -->
+        <div class="panel">
+            <h2>CROPS</h2>
+            <div id="cropsInfo">Not at a farm field</div>
+            <div id="cropsDisplay" class="crop-grid"></div>
         </div>
 
         <!-- Decision Log Panel -->
         <div class="panel">
-            <h2>🧠 Decision Log (AI Transparency)</h2>
+            <h2>AI DECISIONS</h2>
             <div id="decisionLog" class="log-container"></div>
+        </div>
+
+        <!-- NPCs Panel -->
+        <div class="panel">
+            <h2>NPCs</h2>
+            <div id="npcList" class="npc-list"></div>
         </div>
     </div>
 
@@ -2020,11 +2022,11 @@
             document.getElementById('timeOfDay').textContent = gameState.timeOfDay;
 
             const weatherIcons = {
-                'Sunny': '☀️ Sunny',
-                'Rainy': '🌧️ Rainy',
-                'Cloudy': '☁️ Cloudy',
-                'Stormy': '⛈️ Stormy',
-                'Drought': '🏜️ Drought'
+                'Sunny': 'Sunny',
+                'Rainy': 'Rainy',
+                'Cloudy': 'Cloudy',
+                'Stormy': 'Stormy',
+                'Drought': 'Drought'
             };
             document.getElementById('weather').textContent = weatherIcons[gameState.weather] || gameState.weather;
 
@@ -2065,8 +2067,8 @@
 
                 card.innerHTML = `
                     <div class="npc-name">${npc.name}</div>
-                    <div class="npc-location">📍 ${worldSystem.getLocationName(npcPos.locationId)}</div>
-                    <div>Affection: ${affection}/100</div>
+                    <div class="npc-location">LOC: ${worldSystem.getLocationName(npcPos.locationId)}</div>
+                    <div style="font-size: 8px;">AFFECTION: ${affection}/100</div>
                     <div class="affection-bar">
                         <div class="affection-fill" style="width: ${affectionPercent}%"></div>
                     </div>
@@ -2082,7 +2084,7 @@
 
             if (location.fieldPlots) {
                 const crops = location.fieldPlots.getAllCrops();
-                cropsInfoDiv.innerHTML = `<div style="color: #8f8; margin-bottom: 10px;">📍 ${location.name} - ${crops.length} crops planted</div>`;
+                cropsInfoDiv.innerHTML = `<div style="color: #000; font-size: 8px; font-weight: bold; margin-bottom: 2px;">${location.name} - ${crops.length} CROPS</div>`;
 
                 cropsDisplayDiv.innerHTML = '';
 
@@ -2094,28 +2096,28 @@
 
                         if (crop) {
                             div.className = crop.canHarvest() ? 'crop-plot crop-mature' : 'crop-plot crop-planted';
-                            const stageEmoji = {
-                                'Seed': '🌱',
-                                'Sprout': '🌿',
-                                'Growing': '🌾',
-                                'Mature': '✨'
+                            const stageText = {
+                                'Seed': 'S',
+                                'Sprout': 'p',
+                                'Growing': 'G',
+                                'Mature': 'M'
                             };
                             div.innerHTML = `
-                                <div style="font-size: 1.2em;">${stageEmoji[crop.stage] || '🌱'}</div>
-                                <div style="font-size: 0.7em;">${crop.type.substring(0, 3)}</div>
-                                <div style="font-size: 0.6em;">💧${Math.floor(crop.waterLevel)}%</div>
-                                <div style="font-size: 0.6em;">❤️${Math.floor(crop.health)}%</div>
+                                <div style="font-size: 9px; font-weight: bold;">${stageText[crop.stage] || 'S'}</div>
+                                <div style="font-size: 7px;">${crop.type.substring(0, 3)}</div>
+                                <div style="font-size: 6px;">W${Math.floor(crop.waterLevel)}</div>
+                                <div style="font-size: 6px;">H${Math.floor(crop.health)}</div>
                             `;
                         } else {
                             div.className = 'crop-plot crop-empty';
-                            div.innerHTML = `<div style="font-size: 0.8em; color: #666;">(${x},${y})</div>`;
+                            div.innerHTML = `<div style="font-size: 7px; color: #000;">${x},${y}</div>`;
                         }
 
                         cropsDisplayDiv.appendChild(div);
                     }
                 }
             } else {
-                cropsInfoDiv.innerHTML = '<div style="color: #888;">Not at a farm field</div>';
+                cropsInfoDiv.innerHTML = '<div style="color: #000; font-size: 8px;">NOT AT FARM FIELD</div>';
                 cropsDisplayDiv.innerHTML = '';
             }
         }
