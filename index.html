@@ -986,8 +986,8 @@
             harvest() {
                 const cropData = CROPS[this.type];
                 const healthMod = this.health / 100;
-                const yield = Math.floor(cropData.baseYield * healthMod);
-                return Math.max(1, yield);
+                const harvestYield = Math.floor(cropData.baseYield * healthMod);
+                return Math.max(1, harvestYield);
             }
         }
 
