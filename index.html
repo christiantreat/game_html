@@ -1,0 +1,2148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transparent Text-Based Adventure Engine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .panel {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid #4a9eff;
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4af;
+            text-shadow: 0 0 10px rgba(74, 175, 255, 0.5);
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        h2 {
+            color: #4af;
+            border-bottom: 2px solid #4a9eff;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        h3 {
+            color: #8cf;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .game-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: rgba(74, 175, 255, 0.1);
+            border: 1px solid #4a9eff;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .stat-label {
+            color: #8cf;
+            font-size: 0.9em;
+        }
+
+        .stat-value {
+            color: #fff;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #4a9eff 0%, #357abd 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #357abd 0%, #4a9eff 100%);
+            border-color: #8cf;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 175, 255, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .log-container {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #4a9eff;
+            border-radius: 5px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 0.9em;
+        }
+
+        .log-entry {
+            margin-bottom: 10px;
+            padding: 8px;
+            background: rgba(74, 175, 255, 0.05);
+            border-left: 3px solid #4a9eff;
+            border-radius: 3px;
+        }
+
+        .log-turn {
+            color: #ff8;
+            font-weight: bold;
+        }
+
+        .log-event {
+            color: #8f8;
+            margin-left: 10px;
+        }
+
+        .log-decision {
+            color: #f8f;
+            margin-left: 10px;
+        }
+
+        .decision-detail {
+            background: rgba(255, 136, 255, 0.1);
+            border: 1px solid #f8f;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 0.85em;
+        }
+
+        .option {
+            margin: 5px 0;
+            padding: 5px;
+            background: rgba(74, 175, 255, 0.1);
+            border-left: 2px solid #8cf;
+        }
+
+        .option-selected {
+            background: rgba(136, 255, 136, 0.2);
+            border-left-color: #8f8;
+        }
+
+        .score {
+            color: #ff8;
+            font-weight: bold;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .inventory-item {
+            background: rgba(74, 175, 255, 0.1);
+            border: 1px solid #4a9eff;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .item-name {
+            color: #8cf;
+            font-weight: bold;
+        }
+
+        .item-count {
+            color: #fff;
+            font-size: 1.3em;
+        }
+
+        .location-map {
+            display: grid;
+            gap: 5px;
+            margin: 15px 0;
+        }
+
+        .location-node {
+            background: rgba(74, 175, 255, 0.1);
+            border: 1px solid #4a9eff;
+            padding: 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .location-node:hover {
+            background: rgba(74, 175, 255, 0.2);
+            border-color: #8cf;
+        }
+
+        .location-current {
+            background: rgba(136, 255, 136, 0.2);
+            border-color: #8f8;
+        }
+
+        .npc-list {
+            margin-top: 10px;
+        }
+
+        .npc-card {
+            background: rgba(74, 175, 255, 0.1);
+            border: 1px solid #4a9eff;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .npc-name {
+            color: #8cf;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .npc-location {
+            color: #ff8;
+            font-size: 0.9em;
+        }
+
+        .affection-bar {
+            background: rgba(0, 0, 0, 0.4);
+            height: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+            overflow: hidden;
+        }
+
+        .affection-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f44, #ff8, #8f8);
+            transition: width 0.3s;
+        }
+
+        .crop-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            margin: 10px 0;
+        }
+
+        .crop-plot {
+            background: rgba(139, 69, 19, 0.3);
+            border: 1px solid #8b4513;
+            padding: 8px;
+            text-align: center;
+            font-size: 0.85em;
+            border-radius: 3px;
+        }
+
+        .crop-empty {
+            background: rgba(100, 50, 0, 0.2);
+        }
+
+        .crop-planted {
+            background: rgba(34, 139, 34, 0.3);
+            border-color: #228b22;
+        }
+
+        .crop-mature {
+            background: rgba(255, 215, 0, 0.3);
+            border-color: #ffd700;
+        }
+
+        input, select {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #4a9eff;
+            color: white;
+            padding: 8px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 5px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border: 2px solid #4a9eff;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #f88;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4a9eff;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #357abd;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌾 Transparent Text-Based Adventure Engine 🌾</h1>
+
+    <div class="container">
+        <!-- Game Status Panel -->
+        <div class="panel full-width">
+            <h2>🎮 Game Status</h2>
+            <div class="game-info">
+                <div class="stat-box">
+                    <div class="stat-label">Turn</div>
+                    <div class="stat-value" id="turn">1</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Day</div>
+                    <div class="stat-value" id="day">1</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Season</div>
+                    <div class="stat-value" id="season">Spring</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Time</div>
+                    <div class="stat-value" id="timeOfDay">Morning</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Weather</div>
+                    <div class="stat-value" id="weather">☀️ Sunny</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Player Info Panel -->
+        <div class="panel">
+            <h2>👤 Player Info</h2>
+            <div class="stat-box">
+                <div class="stat-label">Location</div>
+                <div class="stat-value" id="playerLocation">Farm Field 1</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Gold</div>
+                <div class="stat-value" id="playerGold">100</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Energy</div>
+                <div class="stat-value" id="playerEnergy">100/100</div>
+            </div>
+
+            <h3>Inventory</h3>
+            <div id="playerInventory" class="inventory-grid"></div>
+        </div>
+
+        <!-- NPCs Panel -->
+        <div class="panel">
+            <h2>👥 NPCs</h2>
+            <div id="npcList" class="npc-list"></div>
+        </div>
+
+        <!-- Crops Panel -->
+        <div class="panel">
+            <h2>🌾 Current Field Crops</h2>
+            <div id="cropsInfo">Not at a farm field</div>
+            <div id="cropsDisplay" class="crop-grid"></div>
+        </div>
+
+        <!-- Actions Panel -->
+        <div class="panel full-width">
+            <h2>⚡ Your Actions</h2>
+            <div class="action-buttons">
+                <button onclick="showMoveDialog()">🚶 Move</button>
+                <button onclick="showTalkDialog()">💬 Talk</button>
+                <button onclick="showGiftDialog()">🎁 Give Gift</button>
+                <button onclick="showPlantDialog()">🌱 Plant Seeds</button>
+                <button onclick="showWaterDialog()">💧 Water Crops</button>
+                <button onclick="showHarvestDialog()">🌾 Harvest</button>
+                <button onclick="showBuyDialog()">🛒 Buy</button>
+                <button onclick="showSellDialog()">💰 Sell</button>
+                <button onclick="restAction()">😴 Rest</button>
+                <button onclick="waitAction()">⏳ Wait</button>
+            </div>
+        </div>
+
+        <!-- Event Log Panel -->
+        <div class="panel">
+            <h2>📜 Event Log</h2>
+            <div id="eventLog" class="log-container"></div>
+        </div>
+
+        <!-- Decision Log Panel -->
+        <div class="panel">
+            <h2>🧠 Decision Log (AI Transparency)</h2>
+            <div id="decisionLog" class="log-container"></div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="actionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">Action</h2>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // ENTITY-COMPONENT SYSTEM (ECS)
+        // ============================================
+
+        class Component {
+            constructor(type) {
+                this.type = type;
+            }
+        }
+
+        class PositionComponent extends Component {
+            constructor(locationId) {
+                super('position');
+                this.locationId = locationId;
+            }
+        }
+
+        class InventoryComponent extends Component {
+            constructor(capacity = 20, maxWeight = 10000) {
+                super('inventory');
+                this.items = {};  // {itemName: quantity}
+                this.capacity = capacity;
+                this.maxWeight = maxWeight;
+            }
+
+            addItem(itemName, quantity = 1) {
+                if (!this.items[itemName]) {
+                    this.items[itemName] = 0;
+                }
+                this.items[itemName] += quantity;
+                return true;
+            }
+
+            removeItem(itemName, quantity = 1) {
+                if (!this.items[itemName] || this.items[itemName] < quantity) {
+                    return false;
+                }
+                this.items[itemName] -= quantity;
+                if (this.items[itemName] <= 0) {
+                    delete this.items[itemName];
+                }
+                return true;
+            }
+
+            hasItem(itemName, quantity = 1) {
+                return this.items[itemName] >= quantity;
+            }
+
+            getItemCount(itemName) {
+                return this.items[itemName] || 0;
+            }
+        }
+
+        class StatsComponent extends Component {
+            constructor(health = 100, energy = 100, maxEnergy = 100) {
+                super('stats');
+                this.health = health;
+                this.energy = energy;
+                this.maxEnergy = maxEnergy;
+                this.gold = 100;
+            }
+        }
+
+        class PersonalityComponent extends Component {
+            constructor(traits) {
+                super('personality');
+                this.friendliness = traits.friendliness || 50;
+                this.generosity = traits.generosity || 50;
+                this.chattiness = traits.chattiness || 50;
+                this.traits = traits.traits || [];
+            }
+        }
+
+        class RelationshipComponent extends Component {
+            constructor() {
+                super('relationship');
+                this.relationships = {};  // {entityId: {affection, trust, respect}}
+            }
+
+            initRelationship(entityId) {
+                if (!this.relationships[entityId]) {
+                    this.relationships[entityId] = {
+                        affection: 0,
+                        trust: 50,
+                        respect: 50
+                    };
+                }
+            }
+
+            modifyAffection(entityId, amount) {
+                this.initRelationship(entityId);
+                this.relationships[entityId].affection += amount;
+                this.relationships[entityId].affection = Math.max(-100, Math.min(100, this.relationships[entityId].affection));
+            }
+
+            getAffection(entityId) {
+                this.initRelationship(entityId);
+                return this.relationships[entityId].affection;
+            }
+        }
+
+        class AIComponent extends Component {
+            constructor(behaviorTree) {
+                super('ai');
+                this.behaviorTree = behaviorTree;
+            }
+        }
+
+        class Entity {
+            constructor(id, name) {
+                this.id = id;
+                this.name = name;
+                this.components = {};
+            }
+
+            addComponent(component) {
+                this.components[component.type] = component;
+            }
+
+            getComponent(type) {
+                return this.components[type];
+            }
+
+            hasComponent(type) {
+                return !!this.components[type];
+            }
+        }
+
+        class EntityManager {
+            constructor() {
+                this.entities = new Map();
+                this.nextId = 0;
+            }
+
+            createEntity(name) {
+                const entity = new Entity(this.nextId++, name);
+                this.entities.set(entity.id, entity);
+                return entity;
+            }
+
+            getEntity(id) {
+                return this.entities.get(id);
+            }
+
+            getAllEntities() {
+                return Array.from(this.entities.values());
+            }
+        }
+
+        // ============================================
+        // EVENT SYSTEM
+        // ============================================
+
+        class GameEvent {
+            constructor(type, data) {
+                this.type = type;
+                this.data = data;
+                this.timestamp = Date.now();
+                this.turn = gameState.turn;
+            }
+        }
+
+        class EventSystem {
+            constructor() {
+                this.events = [];
+                this.maxEvents = 100;
+            }
+
+            logEvent(type, data) {
+                const event = new GameEvent(type, data);
+                this.events.push(event);
+
+                if (this.events.length > this.maxEvents) {
+                    this.events.shift();
+                }
+
+                this.displayEvent(event);
+                return event;
+            }
+
+            displayEvent(event) {
+                const logDiv = document.getElementById('eventLog');
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+
+                let message = `<span class="log-turn">[Turn ${event.turn}]</span> `;
+                message += `<span class="log-event">${this.formatEvent(event)}</span>`;
+
+                entry.innerHTML = message;
+                logDiv.insertBefore(entry, logDiv.firstChild);
+            }
+
+            formatEvent(event) {
+                const d = event.data;
+                switch(event.type) {
+                    case 'move':
+                        return `${d.entityName} moved from ${d.from} to ${d.to}`;
+                    case 'talk':
+                        return `${d.entity1} talked with ${d.entity2} (+${d.affectionGain} affection)`;
+                    case 'gift':
+                        return `${d.giver} gave ${d.item} to ${d.receiver} (+${d.affectionGain} affection)`;
+                    case 'plant':
+                        return `${d.entityName} planted ${d.cropType} at ${d.location} (${d.plotX}, ${d.plotY})`;
+                    case 'water':
+                        return `${d.entityName} watered ${d.cropCount} crops`;
+                    case 'harvest':
+                        return `${d.entityName} harvested ${d.yield} ${d.cropType}`;
+                    case 'buy':
+                        return `${d.buyer} bought ${d.quantity}x ${d.item} for ${d.cost} gold`;
+                    case 'sell':
+                        return `${d.seller} sold ${d.quantity}x ${d.item} for ${d.price} gold`;
+                    case 'rest':
+                        return `${d.entityName} rested (Energy: ${d.oldEnergy} → ${d.newEnergy})`;
+                    case 'time':
+                        return `⏰ Time changed to ${d.newTime}`;
+                    default:
+                        return JSON.stringify(d);
+                }
+            }
+        }
+
+        // ============================================
+        // DECISION SYSTEM
+        // ============================================
+
+        class Decision {
+            constructor(entityId, entityName, situation, options, selected, reason) {
+                this.entityId = entityId;
+                this.entityName = entityName;
+                this.situation = situation;
+                this.options = options;  // [{action, score, reasoning}]
+                this.selected = selected;
+                this.reason = reason;
+                this.turn = gameState.turn;
+            }
+        }
+
+        class DecisionSystem {
+            constructor() {
+                this.decisions = [];
+                this.maxDecisions = 50;
+            }
+
+            logDecision(entityId, entityName, situation, options, selected, reason) {
+                const decision = new Decision(entityId, entityName, situation, options, selected, reason);
+                this.decisions.push(decision);
+
+                if (this.decisions.length > this.maxDecisions) {
+                    this.decisions.shift();
+                }
+
+                this.displayDecision(decision);
+                return decision;
+            }
+
+            displayDecision(decision) {
+                const logDiv = document.getElementById('decisionLog');
+                const entry = document.createElement('div');
+                entry.className = 'decision-detail';
+
+                let html = `<div><strong>${decision.entityName}</strong> - Turn ${decision.turn}</div>`;
+                html += `<div style="color: #ff8; margin: 5px 0;">Situation: ${decision.situation}</div>`;
+                html += `<div style="margin: 10px 0;">Options considered:</div>`;
+
+                decision.options.forEach((opt, idx) => {
+                    const isSelected = opt.action === decision.selected;
+                    html += `<div class="option ${isSelected ? 'option-selected' : ''}">`;
+                    html += `${idx + 1}. ${opt.action} <span class="score">[Score: ${opt.score}]</span>`;
+                    if (opt.reasoning) {
+                        html += `<div style="font-size: 0.9em; margin-left: 10px;">${opt.reasoning}</div>`;
+                    }
+                    html += `</div>`;
+                });
+
+                html += `<div style="color: #8f8; margin-top: 10px;"><strong>Selected:</strong> ${decision.selected}</div>`;
+                html += `<div style="color: #8cf; margin-top: 5px;"><strong>Reason:</strong> ${decision.reason}</div>`;
+
+                entry.innerHTML = html;
+                logDiv.insertBefore(entry, logDiv.firstChild);
+            }
+        }
+
+        // ============================================
+        // BEHAVIOR TREES
+        // ============================================
+
+        class BehaviorNode {
+            constructor(name) {
+                this.name = name;
+            }
+
+            execute(entity, context) {
+                return 'success';
+            }
+        }
+
+        class SequenceNode extends BehaviorNode {
+            constructor(name, children) {
+                super(name);
+                this.children = children;
+            }
+
+            execute(entity, context) {
+                for (let child of this.children) {
+                    const result = child.execute(entity, context);
+                    if (result !== 'success') {
+                        return result;
+                    }
+                }
+                return 'success';
+            }
+        }
+
+        class SelectorNode extends BehaviorNode {
+            constructor(name, children) {
+                super(name);
+                this.children = children;
+            }
+
+            execute(entity, context) {
+                for (let child of this.children) {
+                    const result = child.execute(entity, context);
+                    if (result === 'success') {
+                        return result;
+                    }
+                }
+                return 'failure';
+            }
+        }
+
+        class ConditionNode extends BehaviorNode {
+            constructor(name, condition) {
+                super(name);
+                this.condition = condition;
+            }
+
+            execute(entity, context) {
+                return this.condition(entity, context) ? 'success' : 'failure';
+            }
+        }
+
+        class ActionNode extends BehaviorNode {
+            constructor(name, action) {
+                super(name);
+                this.action = action;
+            }
+
+            execute(entity, context) {
+                return this.action(entity, context);
+            }
+        }
+
+        // ============================================
+        // WORLD & LOCATIONS
+        // ============================================
+
+        class Location {
+            constructor(id, name, type, capacity = 10) {
+                this.id = id;
+                this.name = name;
+                this.type = type;
+                this.capacity = capacity;
+                this.connections = [];
+                this.entities = [];
+                this.shop = null;
+                this.fieldPlots = null;
+            }
+
+            connect(locationId) {
+                if (!this.connections.includes(locationId)) {
+                    this.connections.push(locationId);
+                }
+            }
+
+            addEntity(entityId) {
+                if (!this.entities.includes(entityId)) {
+                    this.entities.push(entityId);
+                }
+            }
+
+            removeEntity(entityId) {
+                const idx = this.entities.indexOf(entityId);
+                if (idx !== -1) {
+                    this.entities.splice(idx, 1);
+                }
+            }
+        }
+
+        class WorldSystem {
+            constructor() {
+                this.locations = new Map();
+            }
+
+            addLocation(location) {
+                this.locations.set(location.id, location);
+            }
+
+            getLocation(id) {
+                return this.locations.get(id);
+            }
+
+            findPath(fromId, toId) {
+                // BFS pathfinding
+                const queue = [[fromId]];
+                const visited = new Set([fromId]);
+
+                while (queue.length > 0) {
+                    const path = queue.shift();
+                    const current = path[path.length - 1];
+
+                    if (current === toId) {
+                        return path;
+                    }
+
+                    const location = this.getLocation(current);
+                    for (let neighbor of location.connections) {
+                        if (!visited.has(neighbor)) {
+                            visited.add(neighbor);
+                            queue.push([...path, neighbor]);
+                        }
+                    }
+                }
+
+                return null;
+            }
+
+            getLocationName(id) {
+                const loc = this.getLocation(id);
+                return loc ? loc.name : 'Unknown';
+            }
+        }
+
+        // ============================================
+        // AGRICULTURE SYSTEM
+        // ============================================
+
+        class CropData {
+            constructor(name, growthDays, waterNeed, bestSeason, baseYield, sellPrice, seedCost) {
+                this.name = name;
+                this.growthDays = growthDays;
+                this.waterNeed = waterNeed;
+                this.bestSeason = bestSeason;
+                this.baseYield = baseYield;
+                this.sellPrice = sellPrice;
+                this.seedCost = seedCost;
+            }
+        }
+
+        const CROPS = {
+            'Wheat': new CropData('Wheat', 8, 40, 'Spring', 6, 12, 5),
+            'Corn': new CropData('Corn', 12, 60, 'Summer', 8, 15, 8),
+            'Tomato': new CropData('Tomato', 10, 60, 'Summer', 10, 10, 6),
+            'Potato': new CropData('Potato', 7, 30, 'Any', 8, 8, 4),
+            'Carrot': new CropData('Carrot', 6, 40, 'Fall', 5, 6, 3)
+        };
+
+        class Crop {
+            constructor(type, x, y) {
+                this.type = type;
+                this.x = x;
+                this.y = y;
+                this.daysGrown = 0;
+                this.waterLevel = 100;
+                this.health = 100;
+                this.stage = 'Seed';
+            }
+
+            update(season, weather) {
+                const cropData = CROPS[this.type];
+
+                // Water decreases
+                this.waterLevel -= 15;
+
+                if (weather === 'Rainy') {
+                    this.waterLevel += 20;
+                } else if (weather === 'Drought') {
+                    this.waterLevel -= 10;
+                    this.health -= 5;
+                }
+
+                this.waterLevel = Math.max(0, Math.min(100, this.waterLevel));
+
+                // Health effects
+                if (this.waterLevel < 20) {
+                    this.health -= 10;
+                }
+
+                if (season !== cropData.bestSeason && cropData.bestSeason !== 'Any') {
+                    this.health -= 2;
+                }
+
+                this.health = Math.max(0, Math.min(100, this.health));
+
+                // Growth
+                if (this.health > 0) {
+                    this.daysGrown++;
+                    this.updateStage(cropData);
+                }
+            }
+
+            updateStage(cropData) {
+                const progress = this.daysGrown / cropData.growthDays;
+                if (progress >= 1.0) {
+                    this.stage = 'Mature';
+                } else if (progress >= 0.6) {
+                    this.stage = 'Growing';
+                } else if (progress >= 0.2) {
+                    this.stage = 'Sprout';
+                } else {
+                    this.stage = 'Seed';
+                }
+            }
+
+            water() {
+                this.waterLevel = Math.min(100, this.waterLevel + 70);
+            }
+
+            canHarvest() {
+                return this.stage === 'Mature' && this.health > 0;
+            }
+
+            harvest() {
+                const cropData = CROPS[this.type];
+                const healthMod = this.health / 100;
+                const yield = Math.floor(cropData.baseYield * healthMod);
+                return Math.max(1, yield);
+            }
+        }
+
+        class FieldPlots {
+            constructor(width = 10, height = 10) {
+                this.width = width;
+                this.height = height;
+                this.plots = {};  // "x,y": Crop
+            }
+
+            plant(x, y, cropType) {
+                const key = `${x},${y}`;
+                if (this.plots[key]) {
+                    return false;
+                }
+                this.plots[key] = new Crop(cropType, x, y);
+                return true;
+            }
+
+            getCrop(x, y) {
+                return this.plots[`${x},${y}`];
+            }
+
+            removeCrop(x, y) {
+                delete this.plots[`${x},${y}`];
+            }
+
+            getAllCrops() {
+                return Object.values(this.plots);
+            }
+
+            updateAllCrops(season, weather) {
+                for (let crop of this.getAllCrops()) {
+                    crop.update(season, weather);
+                }
+            }
+        }
+
+        // ============================================
+        // ECONOMY SYSTEM
+        // ============================================
+
+        class Item {
+            constructor(name, baseValue, weight, type) {
+                this.name = name;
+                this.baseValue = baseValue;
+                this.weight = weight;
+                this.type = type;  // 'tool', 'seed', 'crop', 'material', 'food'
+            }
+        }
+
+        const ITEMS = {
+            // Tools
+            'Hoe': new Item('Hoe', 50, 500, 'tool'),
+            'Watering Can': new Item('Watering Can', 30, 300, 'tool'),
+            'Sickle': new Item('Sickle', 40, 400, 'tool'),
+
+            // Seeds
+            'Wheat Seeds': new Item('Wheat Seeds', 5, 10, 'seed'),
+            'Corn Seeds': new Item('Corn Seeds', 8, 10, 'seed'),
+            'Tomato Seeds': new Item('Tomato Seeds', 6, 10, 'seed'),
+            'Potato Seeds': new Item('Potato Seeds', 4, 10, 'seed'),
+            'Carrot Seeds': new Item('Carrot Seeds', 3, 10, 'seed'),
+
+            // Crops
+            'Wheat': new Item('Wheat', 12, 50, 'crop'),
+            'Corn': new Item('Corn', 15, 50, 'crop'),
+            'Tomato': new Item('Tomato', 10, 30, 'crop'),
+            'Potato': new Item('Potato', 8, 40, 'crop'),
+            'Carrot': new Item('Carrot', 6, 30, 'crop'),
+
+            // Materials
+            'Wood': new Item('Wood', 5, 200, 'material'),
+            'Stone': new Item('Stone', 3, 300, 'material'),
+            'Iron Ore': new Item('Iron Ore', 15, 500, 'material'),
+
+            // Food
+            'Bread': new Item('Bread', 10, 25, 'food'),
+            'Vegetable Soup': new Item('Vegetable Soup', 15, 50, 'food')
+        };
+
+        class Shop {
+            constructor(name, buyPriceMultiplier, sellPriceMultiplier, initialGold) {
+                this.name = name;
+                this.buyPriceMultiplier = buyPriceMultiplier;
+                this.sellPriceMultiplier = sellPriceMultiplier;
+                this.gold = initialGold;
+                this.inventory = {};
+            }
+
+            getBuyPrice(itemName, quantity = 1) {
+                const item = ITEMS[itemName];
+                return Math.floor(item.baseValue * this.buyPriceMultiplier * quantity);
+            }
+
+            getSellPrice(itemName, quantity = 1) {
+                const item = ITEMS[itemName];
+                return Math.floor(item.baseValue * this.sellPriceMultiplier * quantity);
+            }
+
+            buy(itemName, quantity, buyer) {
+                const price = this.getBuyPrice(itemName, quantity);
+                const stats = buyer.getComponent('stats');
+
+                if (stats.gold < price) {
+                    return { success: false, reason: 'Not enough gold' };
+                }
+
+                stats.gold -= price;
+                this.gold += price;
+                buyer.getComponent('inventory').addItem(itemName, quantity);
+
+                return { success: true, price };
+            }
+
+            sell(itemName, quantity, seller) {
+                const inventory = seller.getComponent('inventory');
+                if (!inventory.hasItem(itemName, quantity)) {
+                    return { success: false, reason: 'Not enough items' };
+                }
+
+                const price = this.getSellPrice(itemName, quantity);
+                if (this.gold < price) {
+                    return { success: false, reason: 'Shop has insufficient gold' };
+                }
+
+                inventory.removeItem(itemName, quantity);
+                seller.getComponent('stats').gold += price;
+                this.gold -= price;
+
+                return { success: true, price };
+            }
+        }
+
+        // ============================================
+        // GAME STATE
+        // ============================================
+
+        class GameState {
+            constructor() {
+                this.turn = 1;
+                this.day = 1;
+                this.season = 'Spring';
+                this.timeOfDay = 'Morning';  // Morning, Afternoon, Evening, Night
+                this.weather = 'Sunny';
+                this.playerId = null;
+            }
+
+            advanceTime() {
+                const times = ['Morning', 'Afternoon', 'Evening', 'Night'];
+                const currentIdx = times.indexOf(this.timeOfDay);
+
+                if (currentIdx === times.length - 1) {
+                    this.timeOfDay = 'Morning';
+                    this.day++;
+
+                    // Update season
+                    if (this.day > 90 && this.day <= 180) this.season = 'Summer';
+                    else if (this.day > 180 && this.day <= 270) this.season = 'Fall';
+                    else if (this.day > 270) this.season = 'Winter';
+                    else this.season = 'Spring';
+
+                    // Random weather
+                    const weathers = ['Sunny', 'Sunny', 'Cloudy', 'Rainy', 'Stormy'];
+                    this.weather = weathers[Math.floor(Math.random() * weathers.length)];
+                } else {
+                    this.timeOfDay = times[currentIdx + 1];
+                }
+
+                eventSystem.logEvent('time', { newTime: this.timeOfDay });
+            }
+        }
+
+        // ============================================
+        // GAME INITIALIZATION
+        // ============================================
+
+        const entityManager = new EntityManager();
+        const eventSystem = new EventSystem();
+        const decisionSystem = new DecisionSystem();
+        const worldSystem = new WorldSystem();
+        const gameState = new GameState();
+
+        function initializeWorld() {
+            // Create locations
+            const farmField1 = new Location(0, 'Farm Field 1', 'field', 10);
+            farmField1.fieldPlots = new FieldPlots();
+            const farmField2 = new Location(1, 'Farm Field 2', 'field', 10);
+            farmField2.fieldPlots = new FieldPlots();
+            const farmField3 = new Location(2, 'Farm Field 3', 'field', 10);
+            farmField3.fieldPlots = new FieldPlots();
+            const farmField4 = new Location(3, 'Farm Field 4', 'field', 10);
+            farmField4.fieldPlots = new FieldPlots();
+            const villageSquare = new Location(4, 'Village Square', 'village', 20);
+            const market = new Location(5, 'Market', 'shop', 15);
+            const generalStore = new Location(6, 'General Store', 'shop', 10);
+            const farmerHome = new Location(7, "Farmer's Home", 'home', 5);
+            const merchantHome = new Location(8, "Merchant's Home", 'home', 5);
+            const shyHome = new Location(9, "Shy Villager's Home", 'home', 5);
+
+            // Connect locations
+            farmField1.connect(1);
+            farmField1.connect(2);
+            farmField2.connect(0);
+            farmField2.connect(3);
+            farmField3.connect(0);
+            farmField3.connect(3);
+            farmField3.connect(4);
+            farmField4.connect(1);
+            farmField4.connect(2);
+            villageSquare.connect(2);
+            villageSquare.connect(5);
+            villageSquare.connect(6);
+            market.connect(4);
+            market.connect(7);
+            generalStore.connect(4);
+            generalStore.connect(8);
+            merchantHome.connect(6);
+            merchantHome.connect(9);
+            farmerHome.connect(5);
+            shyHome.connect(8);
+
+            // Add shops
+            generalStore.shop = new Shop('General Store', 1.2, 0.5, Infinity);
+            market.shop = new Shop("Farmer's Market", 1.1, 0.7, 5000);
+
+            worldSystem.addLocation(farmField1);
+            worldSystem.addLocation(farmField2);
+            worldSystem.addLocation(farmField3);
+            worldSystem.addLocation(farmField4);
+            worldSystem.addLocation(villageSquare);
+            worldSystem.addLocation(market);
+            worldSystem.addLocation(generalStore);
+            worldSystem.addLocation(farmerHome);
+            worldSystem.addLocation(merchantHome);
+            worldSystem.addLocation(shyHome);
+        }
+
+        function createPlayer() {
+            const player = entityManager.createEntity('You (Player)');
+            player.addComponent(new PositionComponent(0));  // Start at Farm Field 1
+            player.addComponent(new InventoryComponent(20, 10000));
+            player.addComponent(new StatsComponent(100, 100, 100));
+            player.addComponent(new RelationshipComponent());
+
+            // Starting inventory
+            const inv = player.getComponent('inventory');
+            inv.addItem('Hoe', 1);
+            inv.addItem('Watering Can', 1);
+            inv.addItem('Wheat Seeds', 20);
+
+            worldSystem.getLocation(0).addEntity(player.id);
+            gameState.playerId = player.id;
+
+            return player;
+        }
+
+        function createNPCs() {
+            // The Farmer
+            const farmer = entityManager.createEntity('Farmer');
+            farmer.addComponent(new PositionComponent(2));  // Farm Field 3
+            farmer.addComponent(new InventoryComponent(20, 10000));
+            farmer.addComponent(new StatsComponent(100, 80, 100));
+            farmer.addComponent(new PersonalityComponent({
+                friendliness: 70,
+                generosity: 80,
+                chattiness: 65,
+                traits: ['friendly', 'honest', 'generous']
+            }));
+            farmer.addComponent(new RelationshipComponent());
+            farmer.addComponent(new AIComponent(createFarmerBehaviorTree()));
+
+            const farmerInv = farmer.getComponent('inventory');
+            farmerInv.addItem('Hoe', 1);
+            farmerInv.addItem('Watering Can', 1);
+            farmerInv.addItem('Wheat Seeds', 10);
+
+            farmer.giftPreferences = {
+                loved: ['Hoe', 'Watering Can', 'Wheat Seeds'],
+                liked: ['Wheat', 'Corn'],
+                disliked: ['Stone']
+            };
+
+            worldSystem.getLocation(2).addEntity(farmer.id);
+
+            // The Merchant
+            const merchant = entityManager.createEntity('Merchant');
+            merchant.addComponent(new PositionComponent(5));  // Market
+            merchant.addComponent(new InventoryComponent(30, 15000));
+            merchant.addComponent(new StatsComponent(100, 100, 100));
+            merchant.addComponent(new PersonalityComponent({
+                friendliness: 20,
+                generosity: 20,
+                chattiness: 50,
+                traits: ['greedy', 'honest', 'ambitious']
+            }));
+            merchant.addComponent(new RelationshipComponent());
+            merchant.addComponent(new AIComponent(createMerchantBehaviorTree()));
+
+            merchant.getComponent('stats').gold = 500;
+            merchant.giftPreferences = {
+                loved: ['Iron Ore', 'Bread'],
+                liked: ['Wheat', 'Corn']
+            };
+
+            worldSystem.getLocation(5).addEntity(merchant.id);
+
+            // The Shy Villager
+            const shy = entityManager.createEntity('Shy Villager');
+            shy.addComponent(new PositionComponent(9));  // Home
+            shy.addComponent(new InventoryComponent(15, 8000));
+            shy.addComponent(new StatsComponent(100, 90, 100));
+            shy.addComponent(new PersonalityComponent({
+                friendliness: 30,
+                generosity: 50,
+                chattiness: 30,
+                traits: ['shy', 'honest']
+            }));
+            shy.addComponent(new RelationshipComponent());
+            shy.addComponent(new AIComponent(createShyBehaviorTree()));
+
+            shy.giftPreferences = {
+                loved: ['Carrot', 'Tomato'],
+                liked: ['Bread', 'Vegetable Soup']
+            };
+
+            worldSystem.getLocation(9).addEntity(shy.id);
+        }
+
+        // ============================================
+        // BEHAVIOR TREE FACTORIES
+        // ============================================
+
+        function createFarmerBehaviorTree() {
+            return new SelectorNode('Farmer Root', [
+                new SequenceNode('Morning Farming', [
+                    new ConditionNode('Is Morning?', (e, c) => gameState.timeOfDay === 'Morning'),
+                    new ActionNode('Farm Work', farmingAction)
+                ]),
+                new SequenceNode('Afternoon Social', [
+                    new ConditionNode('Is Afternoon?', (e, c) => gameState.timeOfDay === 'Afternoon'),
+                    new ActionNode('Socialize', socializeAction)
+                ]),
+                new SequenceNode('Evening Sell', [
+                    new ConditionNode('Is Evening?', (e, c) => gameState.timeOfDay === 'Evening'),
+                    new ActionNode('Sell Crops', sellCropsAction)
+                ]),
+                new ActionNode('Default Wait', waitActionNPC)
+            ]);
+        }
+
+        function createMerchantBehaviorTree() {
+            return new SelectorNode('Merchant Root', [
+                new SequenceNode('Work Hours', [
+                    new ConditionNode('Is Daytime?', (e, c) =>
+                        gameState.timeOfDay === 'Morning' || gameState.timeOfDay === 'Afternoon'),
+                    new ActionNode('Stay at Market', stayAtMarket)
+                ]),
+                new ActionNode('Default Wait', waitActionNPC)
+            ]);
+        }
+
+        function createShyBehaviorTree() {
+            return new SelectorNode('Shy Root', [
+                new ActionNode('Stay Home', stayAtHome)
+            ]);
+        }
+
+        // ============================================
+        // NPC ACTIONS
+        // ============================================
+
+        function farmingAction(entity, context) {
+            const pos = entity.getComponent('position');
+            const location = worldSystem.getLocation(pos.locationId);
+
+            // If not at farm, try to move there
+            if (location.type !== 'field') {
+                moveToType(entity, 'field');
+                return 'success';
+            }
+
+            // Check if crops need watering
+            if (location.fieldPlots) {
+                const crops = location.fieldPlots.getAllCrops();
+                const needWater = crops.filter(c => c.waterLevel < 50);
+
+                if (needWater.length > 0) {
+                    waterCropsNPC(entity, location, needWater);
+                    return 'success';
+                }
+
+                // Check for harvest
+                const mature = crops.filter(c => c.canHarvest());
+                if (mature.length > 0) {
+                    harvestCropsNPC(entity, location, mature);
+                    return 'success';
+                }
+            }
+
+            return 'success';
+        }
+
+        function socializeAction(entity, context) {
+            const pos = entity.getComponent('position');
+
+            // Move to village square
+            if (pos.locationId !== 4) {
+                moveNPCTo(entity, 4);
+                return 'success';
+            }
+
+            // Try to talk to someone
+            const location = worldSystem.getLocation(4);
+            const others = location.entities.filter(id => id !== entity.id && id !== gameState.playerId);
+
+            if (others.length > 0) {
+                const target = entityManager.getEntity(others[0]);
+                talkNPC(entity, target);
+            }
+
+            return 'success';
+        }
+
+        function sellCropsAction(entity, context) {
+            const pos = entity.getComponent('position');
+
+            // Move to market
+            if (pos.locationId !== 5) {
+                moveNPCTo(entity, 5);
+                return 'success';
+            }
+
+            // Sell crops
+            const inv = entity.getComponent('inventory');
+            const location = worldSystem.getLocation(5);
+
+            if (location.shop) {
+                for (let itemName in inv.items) {
+                    if (ITEMS[itemName] && ITEMS[itemName].type === 'crop') {
+                        const quantity = inv.items[itemName];
+                        if (quantity > 0) {
+                            location.shop.sell(itemName, quantity, entity);
+                        }
+                    }
+                }
+            }
+
+            return 'success';
+        }
+
+        function stayAtMarket(entity, context) {
+            const pos = entity.getComponent('position');
+            if (pos.locationId !== 5) {
+                moveNPCTo(entity, 5);
+            }
+            return 'success';
+        }
+
+        function stayAtHome(entity, context) {
+            // Shy villager stays home
+            return 'success';
+        }
+
+        function waitActionNPC(entity, context) {
+            return 'success';
+        }
+
+        function moveToType(entity, locationType) {
+            const currentPos = entity.getComponent('position');
+
+            // Find nearest location of type
+            for (let [id, loc] of worldSystem.locations) {
+                if (loc.type === locationType) {
+                    moveNPCTo(entity, id);
+                    return;
+                }
+            }
+        }
+
+        function moveNPCTo(entity, targetLocationId) {
+            const pos = entity.getComponent('position');
+            const path = worldSystem.findPath(pos.locationId, targetLocationId);
+
+            if (path && path.length > 1) {
+                const fromLoc = worldSystem.getLocation(pos.locationId);
+                const toLoc = worldSystem.getLocation(path[1]);
+
+                fromLoc.removeEntity(entity.id);
+                toLoc.addEntity(entity.id);
+                pos.locationId = path[1];
+
+                eventSystem.logEvent('move', {
+                    entityName: entity.name,
+                    from: fromLoc.name,
+                    to: toLoc.name
+                });
+            }
+        }
+
+        function waterCropsNPC(entity, location, crops) {
+            crops.forEach(crop => crop.water());
+
+            eventSystem.logEvent('water', {
+                entityName: entity.name,
+                cropCount: crops.length
+            });
+
+            decisionSystem.logDecision(
+                entity.id,
+                entity.name,
+                `At ${location.name}, ${crops.length} crops need water`,
+                [
+                    { action: 'Water crops', score: 90, reasoning: 'Crops need water urgently' },
+                    { action: 'Do nothing', score: 10, reasoning: 'Low priority' }
+                ],
+                'Water crops',
+                'Prevent crops from withering'
+            );
+        }
+
+        function harvestCropsNPC(entity, location, crops) {
+            const inv = entity.getComponent('inventory');
+            let totalYield = 0;
+
+            crops.forEach(crop => {
+                const yield = crop.harvest();
+                const cropType = crop.type;
+                inv.addItem(cropType, yield);
+                totalYield += yield;
+                location.fieldPlots.removeCrop(crop.x, crop.y);
+            });
+
+            eventSystem.logEvent('harvest', {
+                entityName: entity.name,
+                cropType: crops[0].type,
+                yield: totalYield
+            });
+        }
+
+        function talkNPC(entity1, entity2) {
+            const rel1 = entity1.getComponent('relationship');
+            const rel2 = entity2.getComponent('relationship');
+
+            const affectionGain = 4;
+            rel1.modifyAffection(entity2.id, affectionGain);
+            rel2.modifyAffection(entity1.id, affectionGain);
+
+            eventSystem.logEvent('talk', {
+                entity1: entity1.name,
+                entity2: entity2.name,
+                affectionGain
+            });
+        }
+
+        // ============================================
+        // PLAYER ACTIONS
+        // ============================================
+
+        function showMoveDialog() {
+            const player = entityManager.getEntity(gameState.playerId);
+            const pos = player.getComponent('position');
+            const currentLoc = worldSystem.getLocation(pos.locationId);
+
+            let html = '<h3>Move to where?</h3>';
+            html += '<div class="action-buttons">';
+
+            currentLoc.connections.forEach(locId => {
+                const loc = worldSystem.getLocation(locId);
+                html += `<button onclick="movePlayer(${locId})">${loc.name}</button>`;
+            });
+
+            html += '</div>';
+
+            showModal('Move', html);
+        }
+
+        function movePlayer(targetLocationId) {
+            const player = entityManager.getEntity(gameState.playerId);
+            const pos = player.getComponent('position');
+            const fromLoc = worldSystem.getLocation(pos.locationId);
+            const toLoc = worldSystem.getLocation(targetLocationId);
+
+            fromLoc.removeEntity(player.id);
+            toLoc.addEntity(player.id);
+            pos.locationId = targetLocationId;
+
+            eventSystem.logEvent('move', {
+                entityName: player.name,
+                from: fromLoc.name,
+                to: toLoc.name
+            });
+
+            closeModal();
+            endPlayerTurn();
+        }
+
+        function showTalkDialog() {
+            const player = entityManager.getEntity(gameState.playerId);
+            const pos = player.getComponent('position');
+            const location = worldSystem.getLocation(pos.locationId);
+
+            const npcs = location.entities.filter(id => id !== gameState.playerId);
+
+            if (npcs.length === 0) {
+                alert('No one here to talk to!');
+                return;
+            }
+
+            let html = '<h3>Talk to whom?</h3>';
+            html += '<div class="action-buttons">';
+
+            npcs.forEach(npcId => {
+                const npc = entityManager.getEntity(npcId);
+                html += `<button onclick="talkTo(${npcId})">${npc.name}</button>`;
+            });
+
+            html += '</div>';
+
+            showModal('Talk', html);
+        }
+
+        function talkTo(npcId) {
+            const player = entityManager.getEntity(gameState.playerId);
+            const npc = entityManager.getEntity(npcId);
+
+            const playerRel = player.getComponent('relationship');
+            const npcRel = npc.getComponent('relationship');
+            const personality = npc.getComponent('personality');
+
+            const affectionGain = Math.floor(3 + (personality.chattiness / 100) * 2);
+
+            playerRel.modifyAffection(npcId, affectionGain);
+            npcRel.modifyAffection(player.id, affectionGain);
+
+            eventSystem.logEvent('talk', {
+                entity1: player.name,
+                entity2: npc.name,
+                affectionGain
+            });
+
+            closeModal();
+            endPlayerTurn();
+        }
+
+        function showGiftDialog() {
+            const player = entityManager.getEntity(gameState.playerId);
+            const inv = player.getComponent('inventory');
+            const pos = player.getComponent('position');
+            const location = worldSystem.getLocation(pos.locationId);
+
+            const npcs = location.entities.filter(id => id !== gameState.playerId);
+
+            if (npcs.length === 0) {
+                alert('No one here to give gifts to!');
+                return;
+            }
+
+            let html = '<h3>Give gift to whom?</h3>';
+            html += '<select id="giftRecipient">';
+            npcs.forEach(npcId => {
+                const npc = entityManager.getEntity(npcId);
+                html += `<option value="${npcId}">${npc.name}</option>`;
+            });
+            html += '</select><br><br>';
+
+            html += '<h3>What item?</h3>';
+            html += '<select id="giftItem">';
+            for (let itemName in inv.items) {
+                if (inv.items[itemName] > 0) {
+                    html += `<option value="${itemName}">${itemName} (${inv.items[itemName]})</option>`;
+                }
+            }
+            html += '</select><br><br>';
+
+            html += '<button onclick="giveGift()">Give Gift</button>';
+
+            showModal('Give Gift', html);
+        }
+
+        function giveGift() {
+            const npcId = parseInt(document.getElementById('giftRecipient').value);
+            const itemName = document.getElementById('giftItem').value;
+
+            const player = entityManager.getEntity(gameState.playerId);
+            const npc = entityManager.getEntity(npcId);
+            const inv = player.getComponent('inventory');
+
+            if (!inv.hasItem(itemName)) {
+                alert("You don't have that item!");
+                return;
+            }
+
+            inv.removeItem(itemName);
+
+            // Calculate affection gain
+            let affectionGain = 5;  // Default
+            if (npc.giftPreferences) {
+                if (npc.giftPreferences.loved && npc.giftPreferences.loved.includes(itemName)) {
+                    affectionGain = 15;
+                } else if (npc.giftPreferences.liked && npc.giftPreferences.liked.includes(itemName)) {
+                    affectionGain = 10;
+                } else if (npc.giftPreferences.disliked && npc.giftPreferences.disliked.includes(itemName)) {
+                    affectionGain = -5;
+                }
+            }
+
+            const playerRel = player.getComponent('relationship');
+            const npcRel = npc.getComponent('relationship');
+
+            playerRel.modifyAffection(npcId, affectionGain);
+            npcRel.modifyAffection(player.id, affectionGain);
+
+            eventSystem.logEvent('gift', {
+                giver: player.name,
+                receiver: npc.name,
+                item: itemName,
+                affectionGain
+            });
+
+            closeModal();
+            endPlayerTurn();
+        }
+
+        function showPlantDialog() {
+            const player = entityManager.getEntity(gameState.playerId);
+            const pos = player.getComponent('position');
+            const location = worldSystem.getLocation(pos.locationId);
+
+            if (!location.fieldPlots) {
+                alert('You need to be at a farm field to plant!');
+                return;
+            }
+
+            const inv = player.getComponent('inventory');
+            const seeds = Object.keys(inv.items).filter(item => ITEMS[item] && ITEMS[item].type === 'seed');
+
+            if (seeds.length === 0) {
+                alert('You have no seeds!');
+                return;
+            }
+
+            let html = '<h3>Plant Seeds</h3>';
+            html += '<select id="seedType">';
+            seeds.forEach(seed => {
+                html += `<option value="${seed}">${seed} (${inv.items[seed]})</option>`;
+            });
+            html += '</select><br><br>';
+
+            html += 'Plot X: <input type="number" id="plotX" min="0" max="9" value="0"><br>';
+            html += 'Plot Y: <input type="number" id="plotY" min="0" max="9" value="0"><br><br>';
+
+            html += '<button onclick="plantSeeds()">Plant</button>';
+
+            showModal('Plant Seeds', html);
+        }
+
+        function plantSeeds() {
+            const player = entityManager.getEntity(gameState.playerId);
+            const pos = player.getComponent('position');
+            const location = worldSystem.getLocation(pos.locationId);
+            const inv = player.getComponent('inventory');
+
+            const seedType = document.getElementById('seedType').value;
+            const plotX = parseInt(document.getElementById('plotX').value);
+            const plotY = parseInt(document.getElementById('plotY').value);
+
+            const cropType = seedType.replace(' Seeds', '');
+
+            if (!inv.hasItem(seedType)) {
+                alert("You don't have those seeds!");
+                return;
+            }
+
+            if (!location.fieldPlots.plant(plotX, plotY, cropType)) {
+                alert('That plot is already occupied!');
+                return;
+            }
+
+            inv.removeItem(seedType);
+
+            eventSystem.logEvent('plant', {
+                entityName: player.name,
+                cropType,
+                location: location.name,
+                plotX,
+                plotY
+            });
+
+            closeModal();
+            endPlayerTurn();
+        }
+
+        function showWaterDialog() {
+            const player = entityManager.getEntity(gameState.playerId);
+            const pos = player.getComponent('position');
+            const location = worldSystem.getLocation(pos.locationId);
+
+            if (!location.fieldPlots) {
+                alert('You need to be at a farm field!');
+                return;
+            }
+
+            const crops = location.fieldPlots.getAllCrops();
+            if (crops.length === 0) {
+                alert('No crops to water here!');
+                return;
+            }
+
+            // Water all crops
+            crops.forEach(crop => crop.water());
+
+            eventSystem.logEvent('water', {
+                entityName: player.name,
+                cropCount: crops.length
+            });
+
+            endPlayerTurn();
+        }
+
+        function showHarvestDialog() {
+            const player = entityManager.getEntity(gameState.playerId);
+            const pos = player.getComponent('position');
+            const location = worldSystem.getLocation(pos.locationId);
+
+            if (!location.fieldPlots) {
+                alert('You need to be at a farm field!');
+                return;
+            }
+
+            const crops = location.fieldPlots.getAllCrops();
+            const mature = crops.filter(c => c.canHarvest());
+
+            if (mature.length === 0) {
+                alert('No mature crops to harvest!');
+                return;
+            }
+
+            const inv = player.getComponent('inventory');
+            let totalYield = 0;
+
+            mature.forEach(crop => {
+                const yield = crop.harvest();
+                inv.addItem(crop.type, yield);
+                totalYield += yield;
+
+                eventSystem.logEvent('harvest', {
+                    entityName: player.name,
+                    cropType: crop.type,
+                    yield
+                });
+
+                location.fieldPlots.removeCrop(crop.x, crop.y);
+            });
+
+            alert(`Harvested ${totalYield} crops!`);
+            endPlayerTurn();
+        }
+
+        function showBuyDialog() {
+            const player = entityManager.getEntity(gameState.playerId);
+            const pos = player.getComponent('position');
+            const location = worldSystem.getLocation(pos.locationId);
+
+            if (!location.shop) {
+                alert('No shop here!');
+                return;
+            }
+
+            let html = `<h3>Buy from ${location.shop.name}</h3>`;
+            html += '<select id="buyItem">';
+
+            // List available items
+            const shopItems = ['Wheat Seeds', 'Corn Seeds', 'Tomato Seeds', 'Potato Seeds', 'Carrot Seeds', 'Hoe', 'Watering Can', 'Sickle'];
+            shopItems.forEach(item => {
+                const price = location.shop.getBuyPrice(item);
+                html += `<option value="${item}">${item} - ${price} gold</option>`;
+            });
+
+            html += '</select><br><br>';
+            html += 'Quantity: <input type="number" id="buyQuantity" min="1" value="1"><br><br>';
+            html += '<button onclick="buyItem()">Buy</button>';
+
+            showModal('Buy', html);
+        }
+
+        function buyItem() {
+            const player = entityManager.getEntity(gameState.playerId);
+            const pos = player.getComponent('position');
+            const location = worldSystem.getLocation(pos.locationId);
+
+            const itemName = document.getElementById('buyItem').value;
+            const quantity = parseInt(document.getElementById('buyQuantity').value);
+
+            const result = location.shop.buy(itemName, quantity, player);
+
+            if (!result.success) {
+                alert(result.reason);
+                return;
+            }
+
+            eventSystem.logEvent('buy', {
+                buyer: player.name,
+                item: itemName,
+                quantity,
+                cost: result.price
+            });
+
+            closeModal();
+            endPlayerTurn();
+        }
+
+        function showSellDialog() {
+            const player = entityManager.getEntity(gameState.playerId);
+            const pos = player.getComponent('position');
+            const location = worldSystem.getLocation(pos.locationId);
+
+            if (!location.shop) {
+                alert('No shop here!');
+                return;
+            }
+
+            const inv = player.getComponent('inventory');
+
+            let html = `<h3>Sell to ${location.shop.name}</h3>`;
+            html += '<select id="sellItem">';
+
+            for (let itemName in inv.items) {
+                if (inv.items[itemName] > 0) {
+                    const price = location.shop.getSellPrice(itemName);
+                    html += `<option value="${itemName}">${itemName} (${inv.items[itemName]}) - ${price} gold each</option>`;
+                }
+            }
+
+            html += '</select><br><br>';
+            html += 'Quantity: <input type="number" id="sellQuantity" min="1" value="1"><br><br>';
+            html += '<button onclick="sellItem()">Sell</button>';
+
+            showModal('Sell', html);
+        }
+
+        function sellItem() {
+            const player = entityManager.getEntity(gameState.playerId);
+            const pos = player.getComponent('position');
+            const location = worldSystem.getLocation(pos.locationId);
+
+            const itemName = document.getElementById('sellItem').value;
+            const quantity = parseInt(document.getElementById('sellQuantity').value);
+
+            const result = location.shop.sell(itemName, quantity, player);
+
+            if (!result.success) {
+                alert(result.reason);
+                return;
+            }
+
+            eventSystem.logEvent('sell', {
+                seller: player.name,
+                item: itemName,
+                quantity,
+                price: result.price
+            });
+
+            closeModal();
+            endPlayerTurn();
+        }
+
+        function restAction() {
+            const player = entityManager.getEntity(gameState.playerId);
+            const stats = player.getComponent('stats');
+
+            const oldEnergy = stats.energy;
+            stats.energy = Math.min(stats.maxEnergy, stats.energy + 30);
+
+            eventSystem.logEvent('rest', {
+                entityName: player.name,
+                oldEnergy,
+                newEnergy: stats.energy
+            });
+
+            endPlayerTurn();
+        }
+
+        function waitAction() {
+            eventSystem.logEvent('rest', {
+                entityName: 'You (Player)',
+                oldEnergy: 100,
+                newEnergy: 100
+            });
+            endPlayerTurn();
+        }
+
+        // ============================================
+        // TURN MANAGEMENT
+        // ============================================
+
+        function endPlayerTurn() {
+            // Process NPC turns
+            const npcs = entityManager.getAllEntities().filter(e => e.hasComponent('ai'));
+
+            npcs.forEach(npc => {
+                const ai = npc.getComponent('ai');
+                ai.behaviorTree.execute(npc, {});
+            });
+
+            // Advance time
+            gameState.turn++;
+            gameState.advanceTime();
+
+            // Update all crops
+            worldSystem.locations.forEach(loc => {
+                if (loc.fieldPlots) {
+                    loc.fieldPlots.updateAllCrops(gameState.season, gameState.weather);
+                }
+            });
+
+            // Update UI
+            updateUI();
+        }
+
+        // ============================================
+        // UI UPDATES
+        // ============================================
+
+        function updateUI() {
+            // Game status
+            document.getElementById('turn').textContent = gameState.turn;
+            document.getElementById('day').textContent = gameState.day;
+            document.getElementById('season').textContent = gameState.season;
+            document.getElementById('timeOfDay').textContent = gameState.timeOfDay;
+
+            const weatherIcons = {
+                'Sunny': '☀️ Sunny',
+                'Rainy': '🌧️ Rainy',
+                'Cloudy': '☁️ Cloudy',
+                'Stormy': '⛈️ Stormy',
+                'Drought': '🏜️ Drought'
+            };
+            document.getElementById('weather').textContent = weatherIcons[gameState.weather] || gameState.weather;
+
+            // Player info
+            const player = entityManager.getEntity(gameState.playerId);
+            const pos = player.getComponent('position');
+            const stats = player.getComponent('stats');
+            const inv = player.getComponent('inventory');
+
+            document.getElementById('playerLocation').textContent = worldSystem.getLocationName(pos.locationId);
+            document.getElementById('playerGold').textContent = Math.floor(stats.gold);
+            document.getElementById('playerEnergy').textContent = `${stats.energy}/${stats.maxEnergy}`;
+
+            // Inventory
+            const invDiv = document.getElementById('playerInventory');
+            invDiv.innerHTML = '';
+            for (let itemName in inv.items) {
+                const div = document.createElement('div');
+                div.className = 'inventory-item';
+                div.innerHTML = `<div class="item-name">${itemName}</div><div class="item-count">${inv.items[itemName]}</div>`;
+                invDiv.appendChild(div);
+            }
+
+            // NPCs
+            const npcDiv = document.getElementById('npcList');
+            npcDiv.innerHTML = '';
+
+            const npcs = entityManager.getAllEntities().filter(e => e.id !== gameState.playerId);
+            npcs.forEach(npc => {
+                const npcPos = npc.getComponent('position');
+                const playerRel = player.getComponent('relationship');
+                const affection = playerRel.getAffection(npc.id);
+
+                const card = document.createElement('div');
+                card.className = 'npc-card';
+
+                const affectionPercent = ((affection + 100) / 200) * 100;
+
+                card.innerHTML = `
+                    <div class="npc-name">${npc.name}</div>
+                    <div class="npc-location">📍 ${worldSystem.getLocationName(npcPos.locationId)}</div>
+                    <div>Affection: ${affection}/100</div>
+                    <div class="affection-bar">
+                        <div class="affection-fill" style="width: ${affectionPercent}%"></div>
+                    </div>
+                `;
+
+                npcDiv.appendChild(card);
+            });
+
+            // Crops display
+            const location = worldSystem.getLocation(pos.locationId);
+            const cropsInfoDiv = document.getElementById('cropsInfo');
+            const cropsDisplayDiv = document.getElementById('cropsDisplay');
+
+            if (location.fieldPlots) {
+                const crops = location.fieldPlots.getAllCrops();
+                cropsInfoDiv.innerHTML = `<div style="color: #8f8; margin-bottom: 10px;">📍 ${location.name} - ${crops.length} crops planted</div>`;
+
+                cropsDisplayDiv.innerHTML = '';
+
+                // Show first 25 plots (5x5 grid for visual)
+                for (let y = 0; y < 5; y++) {
+                    for (let x = 0; x < 5; x++) {
+                        const crop = location.fieldPlots.getCrop(x, y);
+                        const div = document.createElement('div');
+
+                        if (crop) {
+                            div.className = crop.canHarvest() ? 'crop-plot crop-mature' : 'crop-plot crop-planted';
+                            const stageEmoji = {
+                                'Seed': '🌱',
+                                'Sprout': '🌿',
+                                'Growing': '🌾',
+                                'Mature': '✨'
+                            };
+                            div.innerHTML = `
+                                <div style="font-size: 1.2em;">${stageEmoji[crop.stage] || '🌱'}</div>
+                                <div style="font-size: 0.7em;">${crop.type.substring(0, 3)}</div>
+                                <div style="font-size: 0.6em;">💧${Math.floor(crop.waterLevel)}%</div>
+                                <div style="font-size: 0.6em;">❤️${Math.floor(crop.health)}%</div>
+                            `;
+                        } else {
+                            div.className = 'crop-plot crop-empty';
+                            div.innerHTML = `<div style="font-size: 0.8em; color: #666;">(${x},${y})</div>`;
+                        }
+
+                        cropsDisplayDiv.appendChild(div);
+                    }
+                }
+            } else {
+                cropsInfoDiv.innerHTML = '<div style="color: #888;">Not at a farm field</div>';
+                cropsDisplayDiv.innerHTML = '';
+            }
+        }
+
+        function showModal(title, content) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('actionModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('actionModal').style.display = 'none';
+        }
+
+        // ============================================
+        // GAME START
+        // ============================================
+
+        window.onload = function() {
+            initializeWorld();
+            createPlayer();
+            createNPCs();
+            updateUI();
+
+            console.log('🌾 Transparent Text-Based Adventure Engine Started! 🌾');
+            console.log('Everything is ready. Start playing!');
+        };
+    </script>
+</body>
+</html>
