@@ -1516,10 +1516,10 @@
             let totalYield = 0;
 
             crops.forEach(crop => {
-                const yield = crop.harvest();
+                const harvestYield = crop.harvest();
                 const cropType = crop.type;
-                inv.addItem(cropType, yield);
-                totalYield += yield;
+                inv.addItem(cropType, harvestYield);
+                totalYield += harvestYield;
                 location.fieldPlots.removeCrop(crop.x, crop.y);
             });
 
@@ -1832,14 +1832,14 @@
             let totalYield = 0;
 
             mature.forEach(crop => {
-                const yield = crop.harvest();
-                inv.addItem(crop.type, yield);
-                totalYield += yield;
+                const harvestYield = crop.harvest();
+                inv.addItem(crop.type, harvestYield);
+                totalYield += harvestYield;
 
                 eventSystem.logEvent('harvest', {
                     entityName: player.name,
                     cropType: crop.type,
-                    yield
+                    yield: harvestYield
                 });
 
                 location.fieldPlots.removeCrop(crop.x, crop.y);
